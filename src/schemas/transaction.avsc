@@ -1,0 +1,209 @@
+{
+  "type": "record",
+  "name": "FinancialTransaction",
+  "namespace": "com.financial.streaming",
+  "doc": "Schema for financial transaction events with fraud detection features",
+  "fields": [
+    {
+      "name": "transaction_id",
+      "type": "string",
+      "doc": "Unique identifier for the transaction"
+    },
+    {
+      "name": "timestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Transaction timestamp in milliseconds since epoch"
+    },
+    {
+      "name": "customer_id",
+      "type": "string",
+      "doc": "Unique customer identifier (will be hashed for privacy)"
+    },
+    {
+      "name": "card_number_last4",
+      "type": "string",
+      "doc": "Last 4 digits of card number for identification"
+    },
+    {
+      "name": "card_type",
+      "type": {
+        "type": "enum",
+        "name": "CardType",
+        "symbols": ["CREDIT", "DEBIT", "PREPAID"]
+      },
+      "doc": "Type of payment card used"
+    },
+    {
+      "name": "amount",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 10,
+        "scale": 2
+      },
+      "doc": "Transaction amount with 2 decimal precision"
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "default": "USD",
+      "doc": "ISO 4217 currency code"
+    },
+    {
+      "name": "merchant_id",
+      "type": "string",
+      "doc": "Unique merchant identifier"
+    },
+    {
+      "name": "merchant_name",
+      "type": "string",
+      "doc": "Merchant display name"
+    },
+    {
+      "name": "merchant_category_code",
+      "type": "string",
+      "doc": "MCC code for merchant categorization"
+    },
+    {
+      "name": "merchant_category",
+      "type": {
+        "type": "enum",
+        "name": "MerchantCategory",
+        "symbols": [
+          "GROCERY", "GAS_STATION", "RESTAURANT", "RETAIL", "ONLINE",
+          "ATM", "HOTEL", "AIRLINE", "PHARMACY", "AUTOMOTIVE",
+          "ENTERTAINMENT", "HEALTHCARE", "EDUCATION", "UTILITIES", "OTHER"
+        ]
+      },
+      "doc": "High-level merchant category"
+    },
+    {
+      "name": "location",
+      "type": {
+        "type": "record",
+        "name": "TransactionLocation",
+        "fields": [
+          {
+            "name": "country",
+            "type": "string",
+            "doc": "ISO 3166-1 alpha-2 country code"
+          },
+          {
+            "name": "state",
+            "type": ["null", "string"],
+            "default": null,
+            "doc": "State or province code"
+          },
+          {
+            "name": "city",
+            "type": ["null", "string"],
+            "default": null,
+            "doc": "City name"
+          },
+          {
+            "name": "zip_code",
+            "type": ["null", "string"],
+            "default": null,
+            "doc": "Postal/ZIP code"
+          },
+          {
+            "name": "latitude",
+            "type": ["null", "double"],
+            "default": null,
+            "doc": "Latitude coordinate"
+          },
+          {
+            "name": "longitude",
+            "type": ["null", "double"],
+            "default": null,
+            "doc": "Longitude coordinate"
+          }
+        ]
+      },
+      "doc": "Geographic location of the transaction"
+    },
+    {
+      "name": "channel",
+      "type": {
+        "type": "enum",
+        "name": "TransactionChannel",
+        "symbols": ["ONLINE", "POS", "ATM", "MOBILE", "PHONE"]
+      },
+      "doc": "Channel through which transaction was initiated"
+    },
+    {
+      "name": "status",
+      "type": {
+        "type": "enum",
+        "name": "TransactionStatus",
+        "symbols": ["PENDING", "APPROVED", "DECLINED", "CANCELLED", "REFUNDED"]
+      },
+      "doc": "Current status of the transaction"
+    },
+    {
+      "name": "risk_score",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Initial risk score (0.0 to 1.0) if available"
+    },
+    {
+      "name": "authorization_code",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Authorization code from payment processor"
+    },
+    {
+      "name": "processor_response_code",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Response code from payment processor"
+    },
+    {
+      "name": "is_international",
+      "type": "boolean",
+      "default": false,
+      "doc": "Whether transaction crosses international borders"
+    },
+    {
+      "name": "customer_present",
+      "type": "boolean",
+      "default": true,
+      "doc": "Whether customer was physically present"
+    },
+    {
+      "name": "entry_method",
+      "type": {
+        "type": "enum",
+        "name": "EntryMethod",
+        "symbols": ["CHIP", "SWIPE", "CONTACTLESS", "MANUAL", "ONLINE"]
+      },
+      "doc": "Method used to enter card information"
+    },
+    {
+      "name": "metadata",
+      "type": {
+        "type": "map",
+        "values": "string"
+      },
+      "default": {},
+      "doc": "Additional transaction metadata"
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Record creation timestamp"
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "default": "1.0",
+      "doc": "Schema version for backward compatibility"
+    }
+  ]
+}

@@ -1,0 +1,231 @@
+{
+  "type": "record",
+  "name": "FraudAlert",
+  "namespace": "com.financial.streaming",
+  "doc": "Schema for fraud detection alerts",
+  "fields": [
+    {
+      "name": "alert_id",
+      "type": "string",
+      "doc": "Unique identifier for the fraud alert"
+    },
+    {
+      "name": "transaction_id",
+      "type": "string",
+      "doc": "Reference to the original transaction"
+    },
+    {
+      "name": "customer_id_hash",
+      "type": "string",
+      "doc": "Hashed customer identifier for privacy"
+    },
+    {
+      "name": "alert_timestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "When the alert was generated"
+    },
+    {
+      "name": "alert_type",
+      "type": {
+        "type": "enum",
+        "name": "AlertType",
+        "symbols": [
+          "VELOCITY_ANOMALY",
+          "AMOUNT_ANOMALY", 
+          "GEOGRAPHIC_ANOMALY",
+          "MERCHANT_RISK",
+          "TIME_PATTERN_ANOMALY",
+          "CROSS_BORDER",
+          "HIGH_RISK_LOCATION",
+          "SUSPICIOUS_PATTERN"
+        ]
+      },
+      "doc": "Type of fraud pattern detected"
+    },
+    {
+      "name": "severity",
+      "type": {
+        "type": "enum",
+        "name": "AlertSeverity",
+        "symbols": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+      },
+      "doc": "Severity level of the alert"
+    },
+    {
+      "name": "risk_score",
+      "type": "double",
+      "doc": "Risk score between 0.0 and 1.0"
+    },
+    {
+      "name": "confidence_score",
+      "type": "double",
+      "doc": "Confidence in the alert between 0.0 and 1.0"
+    },
+    {
+      "name": "features",
+      "type": {
+        "type": "record",
+        "name": "FraudFeatures",
+        "fields": [
+          {
+            "name": "velocity_1h",
+            "type": ["null", "int"],
+            "default": null,
+            "doc": "Number of transactions in past 1 hour"
+          },
+          {
+            "name": "velocity_6h",
+            "type": ["null", "int"],
+            "default": null,
+            "doc": "Number of transactions in past 6 hours"
+          },
+          {
+            "name": "velocity_24h",
+            "type": ["null", "int"],
+            "default": null,
+            "doc": "Number of transactions in past 24 hours"
+          },
+          {
+            "name": "amount_zscore",
+            "type": ["null", "double"],
+            "default": null,
+            "doc": "Z-score of transaction amount vs customer history"
+          },
+          {
+            "name": "distance_from_last_km",
+            "type": ["null", "double"],
+            "default": null,
+            "doc": "Distance in km from last transaction location"
+          },
+          {
+            "name": "time_since_last_minutes",
+            "type": ["null", "double"],
+            "default": null,
+            "doc": "Minutes since last transaction"
+          },
+          {
+            "name": "merchant_risk_score",
+            "type": ["null", "double"],
+            "default": null,
+            "doc": "Risk score of the merchant"
+          },
+          {
+            "name": "hour_of_day",
+            "type": "int",
+            "doc": "Hour of day (0-23)"
+          },
+          {
+            "name": "day_of_week",
+            "type": "int",
+            "doc": "Day of week (1=Monday, 7=Sunday)"
+          },
+          {
+            "name": "is_weekend",
+            "type": "boolean",
+            "doc": "Whether transaction occurred on weekend"
+          }
+        ]
+      },
+      "doc": "Features used for fraud detection"
+    },
+    {
+      "name": "transaction_summary",
+      "type": {
+        "type": "record",
+        "name": "TransactionSummary",
+        "fields": [
+          {
+            "name": "amount",
+            "type": {
+              "type": "bytes",
+              "logicalType": "decimal",
+              "precision": 10,
+              "scale": 2
+            },
+            "doc": "Transaction amount"
+          },
+          {
+            "name": "currency",
+            "type": "string",
+            "doc": "Currency code"
+          },
+          {
+            "name": "merchant_category",
+            "type": "string",
+            "doc": "Merchant category"
+          },
+          {
+            "name": "location_country",
+            "type": "string",
+            "doc": "Transaction country"
+          },
+          {
+            "name": "channel",
+            "type": "string",
+            "doc": "Transaction channel"
+          }
+        ]
+      },
+      "doc": "Summary of the flagged transaction"
+    },
+    {
+      "name": "rules_triggered",
+      "type": {
+        "type": "array",
+        "items": "string"
+      },
+      "doc": "List of fraud rules that were triggered"
+    },
+    {
+      "name": "recommended_action",
+      "type": {
+        "type": "enum",
+        "name": "RecommendedAction",
+        "symbols": ["MONITOR", "REVIEW", "BLOCK", "DECLINE", "REQUEST_VERIFICATION"]
+      },
+      "doc": "Recommended action for this alert"
+    },
+    {
+      "name": "investigator_assigned",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "ID of investigator assigned to review"
+    },
+    {
+      "name": "status",
+      "type": {
+        "type": "enum",
+        "name": "AlertStatus",
+        "symbols": ["OPEN", "IN_REVIEW", "RESOLVED", "FALSE_POSITIVE", "CONFIRMED_FRAUD"]
+      },
+      "default": "OPEN",
+      "doc": "Current status of the alert"
+    },
+    {
+      "name": "metadata",
+      "type": {
+        "type": "map",
+        "values": "string"
+      },
+      "default": {},
+      "doc": "Additional alert metadata"
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Alert creation timestamp"
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "default": "1.0",
+      "doc": "Schema version"
+    }
+  ]
+}
