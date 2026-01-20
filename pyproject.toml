@@ -3,16 +3,16 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "financial-streaming-pipeline"
+name = "fraudstream"
 version = "1.0.0"
-description = "Production-grade real-time financial transaction streaming pipeline with fraud detection"
+description = "Real-time financial transaction processing and fraud detection at scale"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.9"
 authors = [
     {name = "Financial Streaming Team"}
 ]
-keywords = ["streaming", "kafka", "spark", "fraud-detection", "data-engineering"]
+keywords = ["fraud-detection", "streaming", "kafka", "spark", "fintech", "data-engineering", "real-time"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
