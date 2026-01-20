@@ -411,9 +411,10 @@ class TransactionProcessor:
     def write_to_silver(self, df: DataFrame) -> StreamingQuery:
         """Write cleaned and enriched data to silver layer."""
         logger.info("Writing to Snowflake silver layer")
-        
-        # Prepare data for silver (cleaned) layer
-        silver_df = df.filter(col("data_quality_score") > 0.8)  # Only high-quality data
+
+        # Filter by configurable quality threshold
+        quality_threshold = self.settings.data_quality.silver_quality_threshold
+        silver_df = df.filter(col("data_quality_score") > quality_threshold)
         
         silver_df = silver_df.select(
             col("transaction_id"),
@@ -511,8 +512,8 @@ class TransactionProcessor:
             logger.info(f"Started {len(queries)} streaming queries")
             return queries
             
-        except Exception as e:
-            logger.error(f"Failed to start streaming pipeline: {e}")
+        except Exception:
+            logger.exception("Failed to start streaming pipeline")
             raise
     
     def stop_streaming_pipeline(self):
@@ -570,8 +571,8 @@ def main():
             
     except KeyboardInterrupt:
         logger.info("Received interrupt signal, stopping pipeline...")
-    except Exception as e:
-        logger.error(f"Pipeline error: {e}")
+    except Exception:
+        logger.exception("Pipeline error")
         raise
     finally:
         processor.stop_streaming_pipeline()

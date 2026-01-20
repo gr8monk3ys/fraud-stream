@@ -6,12 +6,12 @@ import json
 import random
 import time
 import uuid
-import threading
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Dict, List, Optional, Tuple
+from pathlib import Path
+from typing import Dict, List, Optional
 import logging
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
 from confluent_kafka import Producer
 from confluent_kafka.schema_registry import SchemaRegistryClient
@@ -19,6 +19,10 @@ from confluent_kafka.schema_registry.avro import AvroSerializer
 from confluent_kafka.serialization import SerializationContext, MessageField
 
 from src.config import settings
+
+# Get the project root directory (parent of src/)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+SCHEMAS_DIR = PROJECT_ROOT / "src" / "schemas"
 
 
 # Configure logging
@@ -117,10 +121,11 @@ class TransactionProducer:
     
     def _create_avro_serializer(self) -> AvroSerializer:
         """Create Avro serializer for transactions."""
-        # Load schema from file
-        with open('src/schemas/transaction.avsc', 'r') as f:
+        # Load schema from file using absolute path
+        schema_path = SCHEMAS_DIR / "transaction.avsc"
+        with open(schema_path, 'r') as f:
             schema_str = f.read()
-        
+
         return AvroSerializer(
             schema_registry_client=self.schema_registry_client,
             schema_str=schema_str,
