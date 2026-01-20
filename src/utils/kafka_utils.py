@@ -131,8 +131,8 @@ class KafkaManager:
             logger.info(f"Registered schema {subject} with ID: {schema_id}")
             return schema_id
             
-        except Exception as e:
-            logger.error(f"Failed to register schema {subject}: {e}")
+        except Exception:
+            logger.exception(f"Failed to register schema {subject}")
             raise
     
     def setup_streaming_topics(self) -> bool:

@@ -7,8 +7,12 @@ import sys
 import os
 from pathlib import Path
 
+# Project root and schema paths
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+SCHEMAS_DIR = PROJECT_ROOT / "src" / "schemas"
+
 # Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.config import settings
 from src.utils.kafka_utils import KafkaManager
@@ -37,13 +41,13 @@ def setup_kafka():
         try:
             transaction_schema_id = kafka_manager.register_schema(
                 f"{settings.kafka.transactions_topic}-value",
-                "src/schemas/transaction.avsc"
+                str(SCHEMAS_DIR / "transaction.avsc")
             )
             logger.info(f"✅ Transaction schema registered with ID: {transaction_schema_id}")
-            
+
             fraud_alert_schema_id = kafka_manager.register_schema(
-                f"{settings.kafka.fraud_alerts_topic}-value", 
-                "src/schemas/fraud_alert.avsc"
+                f"{settings.kafka.fraud_alerts_topic}-value",
+                str(SCHEMAS_DIR / "fraud_alert.avsc")
             )
             logger.info(f"✅ Fraud alert schema registered with ID: {fraud_alert_schema_id}")
             

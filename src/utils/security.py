@@ -6,13 +6,39 @@ import hashlib
 import hmac
 import secrets
 import re
-from typing import Dict, List, Optional, Any, Union
+from datetime import datetime, timezone
+from typing import Dict, List, Optional, Any
 import logging
 from functools import lru_cache
 
 from src.config import settings
 
 logger = logging.getLogger(__name__)
+
+
+# Module-level cache for identifier hashing (avoids memory leak from instance method caching)
+@lru_cache(maxsize=10000)
+def _hash_identifier_cached(identifier: str, salt: bytes, hash_length: int) -> str:
+    """
+    Cached hash function at module level to avoid memory leak.
+
+    Args:
+        identifier: String to hash
+        salt: Salt bytes for HMAC
+        hash_length: Length of hash to return
+
+    Returns:
+        Hexadecimal hash string
+    """
+    if not identifier:
+        return "UNKNOWN"
+
+    hash_object = hmac.new(
+        salt,
+        identifier.encode('utf-8'),
+        hashlib.sha256
+    )
+    return hash_object.hexdigest()[:hash_length]
 
 
 class SecurityManager:
@@ -72,28 +98,20 @@ class PIIMasker:
             self.salt = b"default-salt-for-development-only"
             logger.warning("Using default salt - this should not be used in production!")
     
-    @lru_cache(maxsize=10000)
     def hash_identifier(self, identifier: str) -> str:
         """
         Hash identifier (customer ID, etc.) with salt.
-        
+
+        Uses module-level cache to avoid memory leak from instance method caching.
+
         Args:
             identifier: String to hash
-            
+
         Returns:
             Hexadecimal hash string
         """
-        if not identifier:
-            return "UNKNOWN"
-        
-        # Use HMAC for secure hashing with salt
-        hash_object = hmac.new(
-            self.salt,
-            identifier.encode('utf-8'),
-            hashlib.sha256
-        )
-        
-        return hash_object.hexdigest()[:16]  # 16 characters for reasonable uniqueness
+        hash_length = self.settings.security.hash_length
+        return _hash_identifier_cached(identifier, self.salt, hash_length)
     
     def mask_card_number(self, card_number: str) -> str:
         """
@@ -264,7 +282,7 @@ class PIIMasker:
         
         masked_transaction['metadata']['pii_masked'] = 'true'
         masked_transaction['metadata']['masking_timestamp'] = str(
-            __import__('datetime').datetime.utcnow()
+            datetime.now(timezone.utc)
         )
         
         return masked_transaction
@@ -356,7 +374,7 @@ class AuditLogger:
             return
         
         audit_entry = {
-            'timestamp': __import__('datetime').datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'user_id': user_id,
             'operation': operation,
             'data_type': data_type,
@@ -371,7 +389,7 @@ class AuditLogger:
             return
         
         audit_entry = {
-            'timestamp': __import__('datetime').datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'investigator_id': investigator_id,
             'transaction_id': transaction_id,
             'action': action,
@@ -386,7 +404,7 @@ class AuditLogger:
             return
         
         audit_entry = {
-            'timestamp': __import__('datetime').datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'user_id': user_id,
             'table_name': table_name,
             'row_count': row_count,

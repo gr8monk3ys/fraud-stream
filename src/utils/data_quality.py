@@ -4,7 +4,7 @@ Integrates with Great Expectations for comprehensive data validation.
 """
 import logging
 from typing import Dict, List, Optional, Any, Tuple, Union
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 import pandas as pd
 from decimal import Decimal
@@ -283,7 +283,7 @@ class DataQualityValidator:
                 else:
                     transaction_time = transaction['timestamp']
                 
-                now = datetime.utcnow()
+                now = datetime.now(timezone.utc)
                 tolerance_hours = self.validation_rules['transaction']['business_rules']['future_timestamp_tolerance_hours']
                 max_future_time = now + timedelta(hours=tolerance_hours)
                 
@@ -325,7 +325,7 @@ class DataQualityValidator:
         Returns:
             Validation summary
         """
-        batch_start_time = datetime.utcnow()
+        batch_start_time = datetime.now(timezone.utc)
         
         validation_func = (
             self.validate_transaction if record_type == 'transaction' 
@@ -350,7 +350,7 @@ class DataQualityValidator:
                 invalid_records.append(invalid_record)
                 all_errors.extend(errors)
         
-        batch_end_time = datetime.utcnow()
+        batch_end_time = datetime.now(timezone.utc)
         processing_time = (batch_end_time - batch_start_time).total_seconds()
         
         # Calculate error frequencies
@@ -393,7 +393,7 @@ class DataQualityValidator:
         
         if total_validations == 0:
             return {
-                'report_timestamp': datetime.utcnow().isoformat(),
+                'report_timestamp': datetime.now(timezone.utc).isoformat(),
                 'status': 'NO_DATA',
                 'message': 'No validations performed yet'
             }
@@ -410,7 +410,7 @@ class DataQualityValidator:
             status = 'CRITICAL'
         
         return {
-            'report_timestamp': datetime.utcnow().isoformat(),
+            'report_timestamp': datetime.now(timezone.utc).isoformat(),
             'status': status,
             'overall_statistics': {
                 'total_validations': total_validations,
@@ -468,7 +468,7 @@ class DataQualityMonitor:
         quality_score = self.validator.get_data_quality_score(validation_summary)
         
         metrics = {
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'quality_score': quality_score,
             'validation_rate': validation_summary['validation_rate'],
             'batch_size': validation_summary['batch_size'],
@@ -484,7 +484,7 @@ class DataQualityMonitor:
     
     def get_quality_trend(self, hours: int = 24) -> Dict[str, Any]:
         """Get data quality trend over specified hours."""
-        cutoff_time = datetime.utcnow() - timedelta(hours=hours)
+        cutoff_time = datetime.now(timezone.utc) - timedelta(hours=hours)
         
         recent_metrics = [
             m for m in self.quality_history
@@ -549,7 +549,7 @@ class DataQualityMonitor:
                 'alert_type': 'QUALITY_DEGRADATION',
                 'severity': 'MEDIUM',
                 'message': 'Data quality trend is degrading over the last 2 hours',
-                'timestamp': datetime.utcnow().isoformat(),
+                'timestamp': datetime.now(timezone.utc).isoformat(),
                 'trend': trend_data
             })
         

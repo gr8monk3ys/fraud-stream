@@ -47,8 +47,8 @@ class SnowflakeManager:
             connection = snowflake.connector.connect(**config)
             logger.info(f"Connected to Snowflake account: {config['account']}")
             return connection
-        except Exception as e:
-            logger.error(f"Failed to connect to Snowflake: {e}")
+        except Exception:
+            logger.exception("Failed to connect to Snowflake")
             raise
     
     def _create_engine(self):

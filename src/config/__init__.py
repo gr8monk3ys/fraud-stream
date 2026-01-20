@@ -2,6 +2,7 @@
 
 from .settings import (
     settings,
+    get_settings,
     AppSettings,
     KafkaSettings,
     SnowflakeSettings,
@@ -15,7 +16,10 @@ from .settings import (
 )
 
 __all__ = [
+    # Global settings instance and factory
     "settings",
+    "get_settings",
+    # Settings classes
     "AppSettings",
     "KafkaSettings",
     "SnowflakeSettings",
