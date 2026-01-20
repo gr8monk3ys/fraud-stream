@@ -12,7 +12,7 @@ snowflake-sqlalchemy==1.5.1
 # Data Processing & ML
 pandas==2.2.0
 numpy==1.26.3
-scikit-learn==1.4.0
+scikit-learn==1.5.0
 great-expectations==0.18.8
 
 # Configuration & Environment
