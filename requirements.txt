@@ -45,7 +45,7 @@ seaborn==0.13.2
 plotly==5.18.0
 
 # Infrastructure & Cloud
-boto3==1.34.34
+boto3==1.42.35
 botocore==1.34.34
 # Note: Terraform is a CLI tool, not a Python package. Install via terraform.io
 
