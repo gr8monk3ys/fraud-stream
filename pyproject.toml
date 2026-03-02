@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fraudstream"
-version = "1.0.0"
+version = "0.1.0"
 description = "Real-time financial transaction processing and fraud detection at scale"
 readme = "README.md"
 license = {text = "MIT"}
