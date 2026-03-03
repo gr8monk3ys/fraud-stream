@@ -7,7 +7,7 @@ fastavro==1.12.1
 
 # Data Warehouse Connectors
 snowflake-connector-python[pandas]>=3.13.1
-snowflake-sqlalchemy==1.5.1
+snowflake-sqlalchemy==1.8.2
 
 # Data Processing & ML
 pandas==2.2.0
